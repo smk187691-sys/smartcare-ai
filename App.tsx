@@ -17,11 +17,18 @@ const AppContent: React.FC = () => {
   const { user } = useAuth();
   const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(true); // Default to true to prevent false offline flags
 
   useEffect(() => {
+    // Only trust explicit offline events, ignore initial navigator.onLine if buggy
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
+    
+    // Check if truly offline right now
+    if (navigator.onLine === false && !window.location.hostname.includes('localhost')) {
+        setIsOnline(false);
+    }
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     return () => {

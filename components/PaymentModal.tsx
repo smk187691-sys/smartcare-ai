@@ -16,12 +16,57 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSuccess,
 
   if (!isOpen) return null;
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     setProcessing(true);
-    setTimeout(() => {
+    try {
+      // 1. Create order on backend
+      const res = await fetch('http://localhost:5000/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, currency: 'INR' })
+      });
+      
+      const order = await res.json();
+      
+      // 2. Initialize Razorpay checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY || "rzp_test_dummy_key", 
+        amount: order.amount, 
+        currency: order.currency,
+        name: "SmartCare AI",
+        description: title,
+        order_id: order.id, 
+        handler: function (response: any) {
+            // Payment success callback
+            setProcessing(false);
+            onSuccess();
+        },
+        prefill: {
+            name: "SmartCare User",
+            email: "user@example.com",
+            contact: "9999999999"
+        },
+        theme: {
+            color: "#059669" // emerald-600
+        },
+        modal: {
+            ondismiss: function() {
+                setProcessing(false);
+            }
+        }
+      };
+      
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any){
+            alert(response.error.description || "Payment failed");
+            setProcessing(false);
+      });
+      rzp.open();
+    } catch (err) {
+      console.error("Payment initiation failed", err);
+      alert("Could not initialize payment gateway. Please try again.");
       setProcessing(false);
-      onSuccess();
-    }, 1500);
+    }
   };
 
   return (
