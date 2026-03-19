@@ -1,0 +1,9 @@
+
+{
+  "name": "SmartCare AI",
+  "description": "A voice-powered assistant for rural communities providing expert guidance on farming and basic healthcare.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
