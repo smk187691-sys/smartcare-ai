@@ -3,7 +3,18 @@ export enum AppTab {
   HOME = 'home',
   FARMING = 'farming',
   HEALTH = 'health',
-  VOICE = 'voice'
+  VOICE = 'voice',
+  PROFILE = 'profile',
+  HISTORY = 'history',
+  SCHEMES = 'schemes'
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  joinedAt: string;
 }
 
 export interface Language {
@@ -46,4 +57,14 @@ export interface LocalAdvice {
   keywords: string[];
   response: string;
   category: 'farming' | 'health' | 'general';
+}
+
+export interface HistoryEntry {
+  id: string;
+  userId: string;
+  type: 'health' | 'farming' | 'voice';
+  question: string;
+  answer: string;
+  language: string;
+  timestamp: string; // ISO
 }

@@ -1,67 +1,77 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppTab, Language, SUPPORTED_LANGUAGES } from './types';
+import { AppTab } from './types';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import AuthScreen from './components/AuthScreen';
 import Home from './components/Home';
 import FarmingAssistant from './components/FarmingAssistant';
 import HealthAssistant from './components/HealthAssistant';
 import VoiceAssistant from './components/VoiceAssistant';
+import ProfileScreen from './components/ProfileScreen';
+import HistoryScreen from './components/HistoryScreen';
+import SchemesScreen from './components/SchemesScreen';
 import Navigation from './components/Navigation';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { user } = useAuth();
+  const { language } = useLanguage();
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [selectedLanguage, setSelectedLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem('smartcare_lang');
-    return saved ? JSON.parse(saved) : SUPPORTED_LANGUAGES[0];
-  });
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
+  // Reset to home tab after log in
   useEffect(() => {
-    localStorage.setItem('smartcare_lang', JSON.stringify(selectedLanguage));
-  }, [selectedLanguage]);
+    if (user) setActiveTab(AppTab.HOME);
+  }, [user]);
+
+  // Show auth screen if not logged in
+  if (!user) return <AuthScreen />;
 
   const renderContent = () => {
     switch (activeTab) {
       case AppTab.HOME:
         return (
-          <Home 
-            onNavigate={setActiveTab} 
-            selectedLanguage={selectedLanguage} 
-            onLanguageChange={setSelectedLanguage} 
+          <Home
+            onNavigate={setActiveTab}
             isOnline={isOnline}
+            user={user}
           />
         );
       case AppTab.FARMING:
-        return <FarmingAssistant language={selectedLanguage} isOnline={isOnline} />;
+        return <FarmingAssistant isOnline={isOnline} />;
       case AppTab.HEALTH:
-        return <HealthAssistant language={selectedLanguage} isOnline={isOnline} />;
+        return <HealthAssistant isOnline={isOnline} />;
       case AppTab.VOICE:
         return (
-          <VoiceAssistant 
-            language={selectedLanguage}
+          <VoiceAssistant
+            language={language}
             isOnline={isOnline}
-            onClose={() => setActiveTab(AppTab.HOME)} 
+            onClose={() => setActiveTab(AppTab.HOME)}
           />
         );
+      case AppTab.PROFILE:
+        return <ProfileScreen />;
+      case AppTab.HISTORY:
+        return <HistoryScreen />;
+      case AppTab.SCHEMES:
+      return <SchemesScreen isOnline={isOnline} />;
       default:
         return (
-          <Home 
-            onNavigate={setActiveTab} 
-            selectedLanguage={selectedLanguage} 
-            onLanguageChange={setSelectedLanguage} 
+          <Home
+            onNavigate={setActiveTab}
             isOnline={isOnline}
+            user={user}
           />
         );
     }
@@ -102,5 +112,13 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <LanguageProvider>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  </LanguageProvider>
+);
 
 export default App;
