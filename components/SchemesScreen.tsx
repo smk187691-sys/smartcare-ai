@@ -33,38 +33,49 @@ const SchemesScreen: React.FC<{ isOnline: boolean }> = ({ isOnline }) => {
 
     setLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.0-flash',
         contents: {
-          parts: [{ text: `Based on this user profile/query: "${profileInput}", act as a Gov Schemes Advisor. Return 5 highly relevant active government schemes (mix of Farming and Health, depending on the query). Format as JSON in ${language.name}. Don't invent schemes, use real Indian government ones.` }]
+          parts: [{ text: `Based on this user profile/query: "${profileInput}", act as a Gov Schemes Advisor. Return 5 highly relevant active government schemes (mix of Farming and Health, depending on the query). Format as JSON in ${language.name} with a top-level "schemes" array. Don't invent schemes, use real Indian government ones.` }]
         },
         config: {
           responseMimeType: 'application/json',
           responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: { type: Type.STRING },
-                title: { type: Type.STRING },
-                description: { type: Type.STRING },
-                eligibility: { type: Type.STRING },
-                category: { type: Type.STRING, enum: ['Farming', 'Health'] },
-                badge: { type: Type.STRING },
-                link: { type: Type.STRING, description: "Relevant google search query or actual link." }
-              },
-              required: ['id', 'title', 'description', 'eligibility', 'category', 'badge', 'link']
-            }
+            type: Type.OBJECT,
+            properties: {
+              schemes: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    id: { type: Type.STRING },
+                    title: { type: Type.STRING },
+                    description: { type: Type.STRING },
+                    eligibility: { type: Type.STRING },
+                    category: { type: Type.STRING, enum: ['Farming', 'Health'] },
+                    badge: { type: Type.STRING },
+                    link: { type: Type.STRING, description: "Relevant google search query or actual link." }
+                  },
+                  required: ['id', 'title', 'description', 'eligibility', 'category', 'badge', 'link']
+                }
+              }
+            },
+            required: ['schemes']
           }
         }
       });
       
-      const result = JSON.parse(response.text || '[]');
-      setSchemes(result);
-    } catch (error) {
+      const result = JSON.parse(response.text || '{"schemes": []}');
+      setSchemes(result.schemes || []);
+    } catch (error: any) {
       console.error('Schemes fetch failed:', error);
-      alert('Could not fetch schemes. Please try again.');
+      const isQuotaError = error?.message?.includes('exceeded') || error?.status === 429;
+      if (isQuotaError) {
+        alert('API Quota Exceeded! Please wait a minute before fetching schemes again.');
+      } else {
+        alert('Could not fetch schemes. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

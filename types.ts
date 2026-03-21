@@ -12,8 +12,9 @@ export enum AppTab {
 export interface User {
   id: string;
   name: string;
-  email: string;
-  passwordHash: string;
+  email?: string;
+  phoneNumber?: string;
+  passwordHash?: string;
   joinedAt: string;
 }
 

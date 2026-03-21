@@ -85,20 +85,15 @@ const MicButton: React.FC<MicButtonProps> = ({ onTranscription, languageCode, is
           if (transcript) onTranscription(transcript);
         };
         recognition.onerror = () => {
-          alert('Speech recognition failed.');
+          console.error('Offline speech recognition failed.');
         };
         recognition.onend = () => setIsProcessing(false);
         recognition.start();
         return;
       }
 
-      if (!isOnline) {
-        alert('Microphone requires an internet connection. Please connect and try again.');
-        setIsProcessing(false);
-        return;
-      }
+      // If online, proceed with Gemini
 
-      // Online mode: Use Gemini for transcription
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = async () => {

@@ -11,7 +11,16 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ onNavigate, isOnline, user }) => {
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
+  const [isEmergencyModalOpen, setIsEmergencyModalOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+
+  const emergencyNumbers = [
+    { id: 'police', num: '100', icon: '👮', label: t('emergency.police') },
+    { id: 'fire', num: '101', icon: '🚒', label: t('emergency.fire') },
+    { id: 'ambulance', num: '102', icon: '🚑', label: t('emergency.ambulance') },
+    { id: 'women', num: '1091', icon: '👩', label: t('emergency.women') },
+    { id: 'unified', num: '112', icon: '🚨', label: 'All-in-One' },
+  ];
 
   return (
     <div className="p-6 pb-28 min-h-screen bg-slate-50">
@@ -83,8 +92,49 @@ const Home: React.FC<HomeProps> = ({ onNavigate, isOnline, user }) => {
         </div>
       )}
 
+      {/* Emergency SOS Modal */}
+      {isEmergencyModalOpen && (
+        <div className="fixed inset-0 bg-rose-950/40 backdrop-blur-md z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-t-[32px] sm:rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-[100%] duration-300 max-h-[85vh] flex flex-col relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-1.5 bg-rose-600"></div>
+            <div className="flex justify-between items-center mb-6 mt-2">
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-900">{t('emergency.title')}</h3>
+                <p className="text-xs text-slate-500 font-medium">{t('emergency.desc')}</p>
+              </div>
+              <button onClick={() => setIsEmergencyModalOpen(false)} className="bg-rose-50 p-2 rounded-full text-rose-400 hover:text-rose-600 transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            
+            <div className="space-y-3 overflow-y-auto pr-2 pb-4 scrollbar-hide">
+              {emergencyNumbers.map((item) => (
+                <a
+                  key={item.id}
+                  href={`tel:${item.num}`}
+                  className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-rose-200 hover:bg-rose-50 transition-all active:scale-[0.98] group"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <p className="font-extrabold text-slate-800">{item.label}</p>
+                      <p className="text-sm font-bold text-rose-600 tracking-widest">{item.num}</p>
+                    </div>
+                  </div>
+                  <div className="bg-rose-600 text-white p-2.5 rounded-full shadow-lg shadow-rose-200 group-hover:animate-bounce">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Voice Assistant Card */}
-      <div className={`${isOnline ? 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800' : 'bg-gradient-to-br from-slate-600 to-slate-800'} rounded-[32px] p-7 text-white mb-8 shadow-xl relative overflow-hidden transition-colors duration-500 group`}>
+      <div className={`${isOnline ? 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800' : 'bg-gradient-to-br from-slate-600 to-slate-800'} rounded-[32px] p-7 text-white mb-6 shadow-xl relative overflow-hidden transition-colors duration-500 group`}>
         <div className="relative z-10 flex flex-col h-full justify-between min-h-[160px]">
           <div>
             <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center mb-4 backdrop-blur-md">
@@ -104,8 +154,24 @@ const Home: React.FC<HomeProps> = ({ onNavigate, isOnline, user }) => {
           </button>
         </div>
         <div className={`absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full opacity-40 blur-3xl transition-transform duration-700 group-hover:scale-110 ${isOnline ? 'bg-fuchsia-500' : 'bg-slate-400'}`}></div>
-        <div className="absolute bottom-0 right-0 opacity-10 transform translate-x-4 translate-y-4">
-             <svg className="w-40 h-40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+      </div>
+
+      {/* Emergency SOS Card */}
+      <div 
+        onClick={() => setIsEmergencyModalOpen(true)}
+        className="bg-white border-2 border-rose-100 rounded-[28px] p-5 mb-8 flex items-center justify-between shadow-sm hover:shadow-md hover:border-rose-200 transition-all cursor-pointer group active:scale-[0.98]"
+      >
+        <div className="flex items-center space-x-4">
+          <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 text-2xl group-hover:bg-rose-600 group-hover:text-white transition-all shadow-inner">
+            🚨
+          </div>
+          <div>
+            <h3 className="font-extrabold text-slate-800 text-lg leading-tight">{t('emergency.title')}</h3>
+            <p className="text-xs text-rose-600 font-bold uppercase tracking-wider mt-0.5">{t('home.health.desc')}</p>
+          </div>
+        </div>
+        <div className="bg-rose-100 text-rose-600 p-2.5 rounded-full transition-colors group-hover:bg-rose-200">
+          <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
         </div>
       </div>
 

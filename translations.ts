@@ -119,6 +119,30 @@ export const translations: Record<string, Record<string, string>> = {
     'payment.total': 'Total Amount',
     'payment.pay': 'Pay ₹{amount} Securely',
     'payment.cancel': 'Cancel',
+
+    // Auth
+    'auth.phone': 'Phone Number',
+    'auth.phone.placeholder': 'Enter mobile number',
+    'auth.otp': 'OTP',
+    'auth.otp.placeholder': 'Enter 6-digit OTP',
+    'auth.sendOtp': 'Send OTP',
+    'auth.verifyOtp': 'Verify & Sign In',
+    'auth.emailOptional': 'Email (Optional)',
+    'auth.noAccount': "Don't have an account? ",
+    'auth.hasAccount': 'Already have an account? ',
+    'auth.signIn': 'Sign In',
+    'auth.signUp': 'Sign Up',
+    'auth.welcome': 'Sign In to SmartCare',
+    'auth.create': 'Create My Account',
+
+    // Emergency
+    'emergency.title': 'Emergency SOS',
+    'emergency.desc': 'Quick access to national emergency services.',
+    'emergency.police': 'Police',
+    'emergency.ambulance': 'Ambulance',
+    'emergency.fire': 'Fire Brigade',
+    'emergency.women': 'Women Helpline',
+    'emergency.call': 'Call {num}',
   },
   hi: {
     'nav.home': 'होम',
@@ -228,6 +252,30 @@ export const translations: Record<string, Record<string, string>> = {
     'payment.total': 'कुल राशि',
     'payment.pay': 'सुरक्षित रूप से ₹{amount} का भुगतान करें',
     'payment.cancel': 'रद्द करें',
+
+    // Auth
+    'auth.phone': 'फ़ोन नंबर',
+    'auth.phone.placeholder': 'मोबाइल नंबर दर्ज करें',
+    'auth.otp': 'ओटीपी',
+    'auth.otp.placeholder': '6-अंकीय ओटीपी दर्ज करें',
+    'auth.sendOtp': 'ओटीपी भेजें',
+    'auth.verifyOtp': 'सत्यापित करें और साइन इन करें',
+    'auth.emailOptional': 'ईमेल (वैकल्पिक)',
+    'auth.noAccount': "अकाउंट नहीं है? ",
+    'auth.hasAccount': 'पहले से अकाउंट है? ',
+    'auth.signIn': 'साइन इन',
+    'auth.signUp': 'साइन अप',
+    'auth.welcome': 'स्मार्टकेयर में साइन इन करें',
+    'auth.create': 'मेरा अकाउंट बनाएं',
+
+    // Emergency
+    'emergency.title': 'आपातकालीन सहायता',
+    'emergency.desc': 'राष्ट्रीय आपातकालीन सेवाओं तक त्वरित पहुँच।',
+    'emergency.police': 'पुलिस',
+    'emergency.ambulance': 'एम्बुलेंस',
+    'emergency.fire': 'दमकल विभाग',
+    'emergency.women': 'महिला हेल्पलाइन',
+    'emergency.call': '{num} पर कॉल करें',
   },
   bho: {
     'nav.home': 'घर',
@@ -337,5 +385,29 @@ export const translations: Record<string, Record<string, string>> = {
     'payment.total': 'कुल पईसा',
     'payment.pay': 'सुरक्षित ₹{amount} दिहीं',
     'payment.cancel': 'रद्द करीं',
-  }
+
+    // Auth
+    'auth.phone': 'फ़ोन नंबर',
+    'auth.phone.placeholder': 'मोबाइल नंबर डालीं',
+    'auth.otp': 'ओटीपी',
+    'auth.otp.placeholder': '6 अंक के ओटीपी डालीं',
+    'auth.sendOtp': 'ओटीपी भेजीं',
+    'auth.verifyOtp': 'जाँचीं आ साइन इन करीं',
+    'auth.emailOptional': 'ईमेल (ज़रूरी नइखे)',
+    'auth.noAccount': "अकाउंट नइखे? ",
+    'auth.hasAccount': 'पहिले से अकाउंट बा? ',
+    'auth.signIn': 'साइन इन',
+    'auth.signUp': 'साइन अप',
+    'auth.welcome': 'स्मार्टकेयर में साइन इन करीं',
+    'auth.create': 'हमार अकाउंट बनाईं',
+
+    // Emergency
+    'emergency.title': 'आपातकालीन मदद',
+    'emergency.desc': 'सरकारी आपातकालीन सेवा खातिर तुरंत फोन करीं।',
+    'emergency.police': 'पुलिस',
+    'emergency.ambulance': 'एम्बुलेंस',
+    'emergency.fire': 'दमकल विभाग',
+    'emergency.women': 'महिला हेल्पलाइन',
+    'emergency.call': '{num} पर फोन करीं',
+  },
 };

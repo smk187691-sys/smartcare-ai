@@ -79,20 +79,21 @@ const HealthAssistant: React.FC<HealthAssistantProps> = ({ isOnline }) => {
     setLoading(true);
     try {
       const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: {
-          parts: [
-            attachment ? { inlineData: { mimeType: attachment.mimeType, data: attachment.data } } : { text: '' },
-            { text: `Patient describes symptoms: "${symptoms}". Analyze this text and any attached image/video/document, and provide: 
+      const contentParts: any[] = [];
+      if (attachment) {
+        contentParts.push({ inlineData: { mimeType: attachment.mimeType, data: attachment.data } });
+      }
+      contentParts.push({ text: `Patient describes symptoms: "${symptoms}". Analyze this text and any attached image/video/document, and provide: 
           1. Possible cause 
           2. Safe home remedies 
           3. Safe Over-The-Counter medicines (e.g. Paracetamol, ORS) 
           4. Safety Warning.
           5. A dynamic Google Maps search term for the specific specialist needed (e.g., "Dermatologist clinic", "Cardiologist", "Pediatrician", "General Hospital").
-          Format response as JSON in ${language.name}.` }
-          ]
-        },
+          Format response as JSON in ${language.name}.` });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: contentParts,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -122,9 +123,14 @@ const HealthAssistant: React.FC<HealthAssistantProps> = ({ isOnline }) => {
           language.code
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Health analysis failed:', error);
-      alert('Could not complete analysis. Please try again.');
+      const isQuotaError = error?.message?.includes('exceeded') || error?.status === 429;
+      if (isQuotaError) {
+        alert('API Quota Exceeded! You have made too many requests in a short time. Please wait 1 minute and try again (Free Tier is limited to 15 requests/minute).');
+      } else {
+        alert('Could not complete analysis. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -325,20 +331,35 @@ const HealthAssistant: React.FC<HealthAssistantProps> = ({ isOnline }) => {
             </button>
           )}
 
-          <button 
-            onClick={() => {
-              if (!reported) {
-                setReported(true);
-                alert("Epidermic Alert logged. Health condition data reported anonymously to the Municipal Health Department.");
-              }
-            }}
-            className={`w-full mt-3 py-4 rounded-xl font-bold text-sm shadow-sm active:scale-95 transition-all flex items-center justify-center space-x-2 border-2 ${
-              reported ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-            <span>{reported ? t('health.btn.reported') : t('health.btn.report')}</span>
-          </button>
+          <div className="flex gap-2 mt-3">
+             <button 
+               onClick={() => window.open(`https://pharmeasy.in/search/all?name=${encodeURIComponent(analysis.medicines[0] || 'medicines')}`, '_blank')}
+               className="w-full py-4 rounded-xl font-bold text-sm shadow-sm active:scale-95 transition-all text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 flex items-center justify-center space-x-2"
+             >
+               <span>🛒 Order Medicines</span>
+             </button>
+             
+             <button 
+               onClick={async () => {
+                 if (!reported) {
+                   setReported(true);
+                   try {
+                     await fetch('http://localhost:5000/api/report', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ type: 'EPIDEMIC_ALERT', data: analysis, location })
+                     });
+                   } catch (e) { console.error('Reporting failed', e); }
+                   alert("Epidemic Alert logged. Health condition data reported anonymously to the Municipal Health Department.");
+                 }
+               }}
+               className={`w-full py-4 rounded-xl font-bold text-sm shadow-sm active:scale-95 transition-all flex items-center justify-center space-x-2 border-2 ${
+                 reported ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+               }`}
+             >
+               <span>{reported ? t('health.btn.reported') : t('health.btn.report')}</span>
+             </button>
+          </div>
 
           <button 
             onClick={() => {setSymptoms(''); setAnalysis(null); setHasPaid(false); setReported(false);}}

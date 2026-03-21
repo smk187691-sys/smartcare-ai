@@ -36,7 +36,7 @@ const ProfileScreen: React.FC = () => {
             <span className="text-3xl font-extrabold text-white">{initials}</span>
           </div>
           <h2 className="text-2xl font-extrabold text-white">{user.name}</h2>
-          <p className="text-emerald-300 text-sm mt-1">{user.email}</p>
+          <p className="text-emerald-300 text-sm mt-1">{user.email || user.phoneNumber}</p>
           <div className="mt-3 px-4 py-1.5 rounded-full text-xs font-bold flex items-center space-x-1.5"
             style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)' }}>
             <span className="text-emerald-400">●</span>
@@ -49,7 +49,7 @@ const ProfileScreen: React.FC = () => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
           {[
-            { icon: '📅', label: t('profile.joined'), value: joinDate.split(' ').slice(1).join(' ') },
+            { icon: '📅', label: t('profile.joined'), value: joinDate.split(' ').length > 2 ? joinDate.split(' ').slice(1).join(' ') : joinDate },
             { icon: '✨', label: t('profile.features'), value: t('profile.allActive') },
             { icon: '🔒', label: t('profile.data'), value: t('profile.onDevice') },
           ].map(s => (
@@ -68,9 +68,10 @@ const ProfileScreen: React.FC = () => {
           </div>
           {[
             { label: t('profile.name'), value: user.name },
-            { label: t('profile.email'), value: user.email },
+            user.phoneNumber ? { label: t('auth.phone'), value: user.phoneNumber } : null,
+            user.email ? { label: t('profile.email'), value: user.email } : null,
             { label: t('profile.memberSince'), value: joinDate },
-          ].map(item => (
+          ].filter(Boolean).map((item: any) => (
             <div key={item.label} className="flex items-center px-5 py-4 border-b border-slate-50 last:border-0">
               <div className="min-w-0">
                 <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">{item.label}</p>
